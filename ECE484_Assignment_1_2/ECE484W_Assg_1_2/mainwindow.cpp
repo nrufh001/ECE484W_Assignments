@@ -13,3 +13,13 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+void MainWindow::on_pushButton_clicked()
+{
+    QString file = QFileDialog::getOpenFileName(this,
+                                                tr("Open File"),
+                                                "C://",
+                                                "Bitmap File (*.bmp);;All files (*.*)");
+    QPixmap picture(file);
+    ui->label->setPixmap(picture);
+}

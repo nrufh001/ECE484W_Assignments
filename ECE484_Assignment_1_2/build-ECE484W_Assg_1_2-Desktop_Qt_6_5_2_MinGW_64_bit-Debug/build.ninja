@@ -191,7 +191,7 @@ build ECE484W_Assg_1_2_autogen/timestamp ECE484W_Assg_1_2_autogen/mocs_compilati
 #############################################
 # Phony custom command for CMakeFiles\ECE484W_Assg_1_2_autogen_timestamp_deps
 
-build CMakeFiles/ECE484W_Assg_1_2_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/ECE484W_Assg_1_2_autogen_timestamp_deps: phony C$:/Qt/6.5.2/mingw_64/./bin/uic.exe C$:/Qt/6.5.2/mingw_64/./bin/moc.exe C$:/Qt/6.5.2/mingw_64/lib/libQt6Core.a C$:/Qt/6.5.2/mingw_64/lib/libQt6Widgets.a
+build CMakeFiles/ECE484W_Assg_1_2_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/ECE484W_Assg_1_2_autogen_timestamp_deps: phony C$:/Qt/6.5.2/mingw_64/lib/libQt6Core.a C$:/Qt/6.5.2/mingw_64/lib/libQt6Widgets.a C$:/Qt/6.5.2/mingw_64/./bin/moc.exe C$:/Qt/6.5.2/mingw_64/./bin/uic.exe
 
 
 #############################################

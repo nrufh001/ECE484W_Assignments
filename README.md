@@ -1,3 +1,8 @@
 # ECE484W_Assignments
+
 ECE484W Assignments
-trying something
+
+## Group Members
+
+Nathan Rufh
+Brice Zimmerman

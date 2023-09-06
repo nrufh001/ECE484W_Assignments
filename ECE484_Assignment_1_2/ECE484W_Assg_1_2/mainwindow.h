@@ -21,6 +21,8 @@ public:
 
 private slots:
     void on_pushButton_clicked();
+    void updateContrastValue(int value);
+    void updateBrightnessValue(int value);
 
 private:
     Ui::MainWindow *ui;

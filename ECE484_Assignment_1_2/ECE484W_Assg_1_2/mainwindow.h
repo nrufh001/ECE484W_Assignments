@@ -24,6 +24,7 @@ private slots:
     void updateContrastValue(int value);
     void updateBrightnessValue(int value);
     void updateBrightness(int value);
+    void updateContrast(int value);
 
 private:
     Ui::MainWindow *ui;

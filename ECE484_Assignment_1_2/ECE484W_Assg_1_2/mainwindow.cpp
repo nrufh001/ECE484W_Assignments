@@ -7,7 +7,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->ContrastSlider, SIGNAL(valueChanged(int)), this, SLOT(updateContrastValue(int))); // Connects the slider value to labels
+    // Connects the slider value to labels
+    connect(ui->ContrastSlider, SIGNAL(valueChanged(int)), this, SLOT(updateContrastValue(int)));
+    connect(ui->ContrastSlider, SIGNAL(valueChanged(int)), this, SLOT(updateContrast(int)));
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightnessValue(int)));
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightness(int)));
 }
@@ -58,6 +60,11 @@ void MainWindow::updateBrightness(int value)
 
     // And finally update the label with the adjusted image
     ui->label->setPixmap(QPixmap::fromImage(image));
+}
+
+void MainWindow::updateContrast(int value)
+{
+    qDebug() << value;
 }
 
 void MainWindow::on_pushButton_clicked()

@@ -37,8 +37,9 @@ void MainWindow::updateBrightness(int value)
     QPixmap currentPixmap = ui->label->pixmap();
     QImage image = currentPixmap.toImage(); // grabbing a capture of the image
 
-    double factor = static_cast<double>(value) / 100.0; // calculating a factor ranges from 0 (darkest) to 2.55 (whitest)
+    double factor = static_cast<double>(value) / 100; // calculating a factor ranges from 0 (darkest) to 2.55 (whitest)
 
+    qDebug() << factor;
     // Now lets go through the entire image
     for (int y = 0; y < image.height(); ++y) // we'll start with height
     {
@@ -57,14 +58,43 @@ void MainWindow::updateBrightness(int value)
             image.setPixel(x, y, qRgb(red, green, blue)); // now lets set the image with those altered pixel values
         }
     }
-
-    // And finally update the label with the adjusted image
-    ui->label->setPixmap(QPixmap::fromImage(image));
+    ui->label->setPixmap(QPixmap::fromImage(image)); // and update the image with the brightness
 }
 
 void MainWindow::updateContrast(int value)
 {
-    qDebug() << value;
+    QPixmap currentPixmap = ui->label->pixmap(); // alright let's grab the current image from the label
+    QImage image = currentPixmap.toImage(); // now let's grab a capture of the image
+
+    double contrastFactor = static_cast<double>(value) / 100.0; // we'll calc the contrast factor to multiply the pixels by (might need to change this later)
+
+    int imageWidth = image.width();
+    int imageDimensions = image.width() * image.height();
+
+    // Iterate through all pixels
+    for (int i = 0; i < imageDimensions; ++i)
+    {
+        int x = i % imageWidth; // calc the x and y
+        int y = i / imageWidth;
+
+        QRgb pixel = image.pixel(x, y); // now we'll grab the pixel at the (x, y)
+
+        int red = qRed(pixel); // pull RGB colors out
+        int green = qGreen(pixel);
+        int blue = qBlue(pixel);
+
+        red = static_cast<int>((red - 128) * contrastFactor + 128); // apply the contrast
+        green = static_cast<int>((green - 128) * contrastFactor + 128);
+        blue = static_cast<int>((blue - 128) * contrastFactor + 128);
+
+        red = qBound(0, red, 255); // can't let those values go under 0 or over 255
+        green = qBound(0, green, 255);
+        blue = qBound(0, blue, 255);
+
+        image.setPixel(x, y, qRgb(red, green, blue)); // set the new contrast
+    }
+
+    ui->label->setPixmap(QPixmap::fromImage(image)); // and we'll update the image
 }
 
 void MainWindow::on_pushButton_clicked()

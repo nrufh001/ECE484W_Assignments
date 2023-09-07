@@ -33,11 +33,10 @@ void MainWindow::updateBrightness(int value)
 {
     // qDebug() << "Slider Value:" << value;
 
-    // Load the current image from the label
-    QPixmap currentPixmap = ui->label->pixmap();
+    QPixmap currentPixmap = ui->label->pixmap(); // Load the current image from the label
     QImage image = currentPixmap.toImage(); // grabbing a capture of the image
 
-    double factor = static_cast<double>(value) / 100; // calculating a factor ranges from 0 (darkest) to 2.55 (whitest)
+    double factor = static_cast<double>(value); // calculating a factor ranges from -1.27 (darkest) to 1.27 (whitest)
 
     qDebug() << factor;
     // Now lets go through the entire image
@@ -46,9 +45,9 @@ void MainWindow::updateBrightness(int value)
         for (int x = 0; x < image.width(); ++x) // next is width
         {
             QRgb pixel = image.pixel(x, y); // grab the pixel in the image
-            int red = qRed(pixel) * factor; // multiply the red in the image by the factor
-            int green = qGreen(pixel) * factor; // multiply the green in the image by the factor
-            int blue = qBlue(pixel) * factor; // multiply the blue in the image by the factor
+            int red = qRed(pixel) + factor; // add the red in the image by the factor
+            int green = qGreen(pixel) + factor; // add the green in the image by the factor
+            int blue = qBlue(pixel) + factor; // add the blue in the image by the factor
 
             // Ensure values stay within the 0-255 range - don't want this to go over or under 0 to 255
             red = qBound(0, red, 255);
@@ -58,7 +57,7 @@ void MainWindow::updateBrightness(int value)
             image.setPixel(x, y, qRgb(red, green, blue)); // now lets set the image with those altered pixel values
         }
     }
-    ui->label->setPixmap(QPixmap::fromImage(image)); // and update the image with the brightness
+    ui->label_2->setPixmap(QPixmap::fromImage(image)); // and update the NEW image with the brightness
 }
 
 void MainWindow::updateContrast(int value)
@@ -104,5 +103,5 @@ void MainWindow::on_pushButton_clicked()
                                                 "C://",
                                                 "Bitmap File (*.bmp);;All files (*.*)");
     QPixmap picture(file);
-    ui->label->setPixmap(picture);
+    ui->label->setPixmap(picture);   
 }

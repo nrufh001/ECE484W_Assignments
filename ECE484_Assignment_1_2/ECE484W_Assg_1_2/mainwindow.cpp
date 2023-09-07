@@ -93,7 +93,7 @@ void MainWindow::updateContrast(int value)
         image.setPixel(x, y, qRgb(red, green, blue)); // set the new contrast
     }
 
-    ui->label->setPixmap(QPixmap::fromImage(image)); // and we'll update the image
+    ui->label_2->setPixmap(QPixmap::fromImage(image)); // and we'll update the image
 }
 
 void MainWindow::on_pushButton_clicked()

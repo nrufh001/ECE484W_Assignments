@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->ContrastSlider, SIGNAL(valueChanged(int)), this, SLOT(updateContrast(int)));
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightnessValue(int)));
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightness(int)));
+    connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveImage);
 }
 
 MainWindow::~MainWindow()
@@ -94,6 +95,18 @@ void MainWindow::updateContrast(int value)
     }
 
     ui->label_2->setPixmap(QPixmap::fromImage(image)); // and we'll update the image
+}
+
+void MainWindow::saveImage()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "Save Image", "", "Bitmap File (*.bmp)"); // lets get the file path
+
+    if (filePath.isEmpty() == false) { // make sure that the path isn't empty
+        QPixmap currentPixmap = ui->label_2->pixmap(); // create a pix map so we can save it as .bmp
+        if (currentPixmap.isNull() == false) { // make sure that there is actually an image to save
+            currentPixmap.save(filePath, "BMP"); // save the pixmap as a bmp file
+        }
+    }
 }
 
 void MainWindow::on_pushButton_clicked()

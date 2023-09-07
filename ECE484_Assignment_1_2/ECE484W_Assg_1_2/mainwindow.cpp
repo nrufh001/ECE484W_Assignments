@@ -63,38 +63,39 @@ void MainWindow::updateBrightness(int value)
 
 void MainWindow::updateContrast(int value)
 {
-    QPixmap currentPixmap = ui->label->pixmap(); // alright let's grab the current image from the label
-    QImage image = currentPixmap.toImage(); // now let's grab a capture of the image
+    QPixmap currentPixmap = ui->label->pixmap(); // Load the current image from the label
+    QImage image = currentPixmap.toImage(); // grabbing a capture of the image
 
-    double contrastFactor = static_cast<double>(value) / 100.0; // we'll calc the contrast factor to multiply the pixels by (might need to change this later)
+    double factor = static_cast<double>(value); // this is from the slider
+    double newFactor;
 
-    int imageWidth = image.width();
-    int imageDimensions = image.width() * image.height();
+    int red;
+    int green;
+    int blue;
 
-    // Iterate through all pixels
-    for (int i = 0; i < imageDimensions; ++i)
+    qDebug() << factor;
+    // Now lets go through the entire image
+    for (int y = 0; y < image.height(); ++y) // we'll start with height
     {
-        int x = i % imageWidth; // calc the x and y
-        int y = i / imageWidth;
+        for (int x = 0; x < image.width(); ++x) // next is width
+        {
+            QRgb pixel = image.pixel(x, y); // grab the pixel in the image
+            newFactor = (259 * (factor + 255)) / (255 * (259 - factor));
 
-        QRgb pixel = image.pixel(x, y); // now we'll grab the pixel at the (x, y)
+            red = (newFactor * (qRed(pixel)) - 128) + 128;
 
-        int red = qRed(pixel); // pull RGB colors out
-        int green = qGreen(pixel);
-        int blue = qBlue(pixel);
+            green = (newFactor * (qGreen(pixel)) - 128) + 128;
 
-        red = static_cast<int>((red - 128) * contrastFactor + 128); // apply the contrast
-        green = static_cast<int>((green - 128) * contrastFactor + 128);
-        blue = static_cast<int>((blue - 128) * contrastFactor + 128);
+            blue = (newFactor * (qBlue(pixel)) - 128) + 128;
+            // Ensure values stay within the 0-255 range - don't want this to go over or under 0 to 255
+            red = qBound(0, red, 255);
+            green = qBound(0, green, 255);
+            blue = qBound(0, blue, 255);
 
-        red = qBound(0, red, 255); // can't let those values go under 0 or over 255
-        green = qBound(0, green, 255);
-        blue = qBound(0, blue, 255);
-
-        image.setPixel(x, y, qRgb(red, green, blue)); // set the new contrast
+            image.setPixel(x, y, qRgb(red, green, blue)); // now lets set the image with those altered pixel values
+        }
     }
-
-    ui->label_2->setPixmap(QPixmap::fromImage(image)); // and we'll update the image
+    ui->label_2->setPixmap(QPixmap::fromImage(image)); // and update the NEW image with the contrast
 }
 
 void MainWindow::saveImage()

@@ -82,7 +82,7 @@ void MainWindow::updateBrightness(int value)
     QString brightnessAndContrast = QString("%1").arg(value, 2, 10, QChar('0')) + // just makes sure that whenever < 10 we add a 0
                                     QString("%1").arg(currentContrast, 2, 10, QChar('0')); // ensures that we send 4 bits at all time
     QByteArray data = brightnessAndContrast.toUtf8();
-    udpSocket.writeDatagram(data, QHostAddress("192.168.1.72"), 80); // send data
+    udpSocket.writeDatagram(data, QHostAddress(ipaddress), 80); // send data
     qDebug() << data;
 }
 
@@ -136,7 +136,7 @@ void MainWindow::updateContrast(int value)
     QString brightnessAndContrast = QString("%1").arg(currentBrightness, 2, 10, QChar('0')) +
                                     QString("%1").arg(remappedValue, 2, 10, QChar('0'));
     QByteArray data = brightnessAndContrast.toUtf8();
-    udpSocket.writeDatagram(data, QHostAddress("192.168.1.72"), 80);
+    udpSocket.writeDatagram(data, QHostAddress(ipaddress), 80);
     qDebug() << data;
 }
 
@@ -154,77 +154,64 @@ void MainWindow::saveImage()
 
 void MainWindow::transferOriginialImage()
 {
-    // Initialize a UDP socket
+    // set up UDP socket
     QUdpSocket udpSocket;
     udpSocket.bind(QHostAddress(ipaddress), port);
 
-    // Load and convert an image
+    // convert the image
     QImage image = originalImage.toImage();
 
-    // Serialize the image data
+    // convert the image
     QByteArray imageData;
     QBuffer buffer(&imageData);
     buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "JPG"); // Use appropriate format
+    image.save(&buffer, "JPG");
 
-    int chunkSize = 1024;
     int totalSize = imageData.size();
     int bytesSent = 0;
-    QByteArray done = "image transferred";
+    QByteArray done = "transferred"; // set end transferred message so program knows when transfer is done
 
-//    while (bytesSent < totalSize) {
-//        QByteArray chunk = imageData.mid(bytesSent, chunkSize);
-//        udpSocket.writeDatagram(chunk, QHostAddress(ipaddress), port);
-//        bytesSent += chunk.size();
-//    }
+    qDebug() << "totalSize: " << totalSize;
 
-//    udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
+    while (bytesSent < totalSize) {
+        QByteArray chunk = imageData.mid(bytesSent, 1024);
+        udpSocket.writeDatagram(chunk, QHostAddress(ipaddress), port);
+        bytesSent += chunk.size();
+        qDebug() << "chunk: " << chunk.size() << " --> " << "bytesSent: " << bytesSent;
+    }
 
-    udpSocket.writeDatagram(imageData, QHostAddress(ipaddress), port);
+    udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
 }
 
 void MainWindow::transferEditedImage()
 {
-    // Open the image file you want to send
-    QString filePath = QFileDialog::getOpenFileName(this, "Open Image", "", "Image Files (*.bmp *.png *.jpg)");
-    if (filePath.isEmpty()) {
-        return; // User canceled or no file selected
+    // set up UDP socket
+    QUdpSocket udpSocket;
+    udpSocket.bind(QHostAddress(ipaddress), port);
+
+    // convert the image
+    QImage image = modifiedImage.toImage();
+
+    // convert the image
+    QByteArray imageData;
+    QBuffer buffer(&imageData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "JPG");
+
+    int totalSize = imageData.size();
+    int bytesSent = 0;
+    QByteArray done = "transferred"; // set end transferred message so program knows when transfer is done
+
+    qDebug() << "totalSize: " << totalSize;
+
+    while (bytesSent < totalSize) {
+        QByteArray chunk = imageData.mid(bytesSent, 1024);
+        udpSocket.writeDatagram(chunk, QHostAddress(ipaddress), port);
+        bytesSent += chunk.size();
+        qDebug() << "chunk: " << chunk.size() << " --> " << "bytesSent: " << bytesSent;
     }
 
-    // Create a TCP socket for the image transfer
-    QTcpSocket tcpSocket;
-
-    // Connect to the server
-    tcpSocket.connectToHost(QHostAddress("192.168.1.229"), 12345);
-
-    if (!tcpSocket.waitForConnected()) {
-        // Handle connection error
-        qDebug() << "Connection failed:" << tcpSocket.errorString();
-        return;
-    }
-
-    // Open the image file and read its contents
-    QFile imageFile(filePath);
-    if (imageFile.open(QIODevice::ReadOnly)) {
-        QByteArray imageData = imageFile.readAll();
-        imageFile.close();
-
-        // Send the image data over the TCP connection
-        qint64 bytesSent = tcpSocket.write(imageData);
-
-        if (bytesSent == -1) {
-            // Handle send error
-            qDebug() << "Error sending image data:" << tcpSocket.errorString();
-        } else {
-            qDebug() << "Image sent successfully!";
-        }
-
-        // Close the socket
-        tcpSocket.close();
-    } else {
-        // Handle file open error
-        qDebug() << "Error opening image file:" << imageFile.errorString();
-    }
+    udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
 }
 
 void MainWindow::on_pushButton_clicked()

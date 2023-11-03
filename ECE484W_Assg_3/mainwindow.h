@@ -32,5 +32,7 @@ private:
     int currentContrast = 0;
     QPixmap modifiedImage;
     QPixmap originalImage;
+    int port = 12345;
+    QString ipaddress = "192.168.1.229";
 };
 #endif // MAINWINDOW_H

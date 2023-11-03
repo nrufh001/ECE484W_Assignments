@@ -154,43 +154,21 @@ void MainWindow::saveImage()
 
 void MainWindow::transferOriginialImage()
 {
-    // Create a TCP socket for the image transfer
-    QTcpSocket tcpSocket;
+    // Initialize a UDP socket
+    QUdpSocket udpSocket;
+    udpSocket.bind(QHostAddress(ipaddress), port);
 
-    // Connect to the server
-    tcpSocket.connectToHost(QHostAddress("192.168.1.219"), 12347);
+    // Load and convert an image
+    QImage image = originalImage.toImage();
 
-    if (!tcpSocket.waitForConnected()) {
-        // Handle connection error
-        qDebug() << "Connection failed:" << tcpSocket.errorString();
-        return;
-    }
+    // Serialize the image data
+    QByteArray imageData;
+    QBuffer buffer(&imageData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "JPEG"); // Use appropriate format
 
-    if (!originalImage.isNull()) {
-        QByteArray byteArray;
-        QBuffer buffer(&byteArray);
-
-        // Save the image as a QByteArray in a suitable format, e.g., PNG
-        originalImage.save(&buffer, "PNG");
-
-        // Send the image data over the TCP connection
-        qint64 bytesSent = tcpSocket.write(byteArray);
-
-        if (bytesSent == -1) {
-            // Handle send error
-            qDebug() << "Error sending image data:" << tcpSocket.errorString();
-        } else {
-            qDebug() << "Image sent successfully!";
-        }
-
-        qDebug() << "Data sent: " << bytesSent;
-
-        // Close the socket
-        tcpSocket.close();
-    } else {
-        // Handle file open error
-        qDebug() << "Error No modified image available to transfer.";
-    }
+    // Send the image data over UDP
+    udpSocket.writeDatagram(imageData, QHostAddress(ipaddress), port);
 }
 
 void MainWindow::transferEditedImage()
@@ -205,7 +183,7 @@ void MainWindow::transferEditedImage()
     QTcpSocket tcpSocket;
 
     // Connect to the server
-    tcpSocket.connectToHost(QHostAddress("192.168.1.219"), 12347);
+    tcpSocket.connectToHost(QHostAddress("192.168.1.229"), 12345);
 
     if (!tcpSocket.waitForConnected()) {
         // Handle connection error

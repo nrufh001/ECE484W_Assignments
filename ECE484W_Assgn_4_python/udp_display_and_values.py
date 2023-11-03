@@ -5,7 +5,7 @@ import socket
 
 # Path to the images
 original_image_path = '/home/root/ECE484W_Assignments/ECE484W_Assgn_4_python/original_image.jpg'
-edited_image_path = '/home/root/ECE484W_Assignments/ECE484W_Assgn_4_python/edited_image.jpg'
+overlay_image_path = '/home/root/ECE484W_Assignments/ECE484W_Assgn_4_python/overlay_image.jpg'
 
 # Window name for display
 window_name = 'image'
@@ -36,7 +36,7 @@ while True:
     if brightness == "00" and contrast == "00":
         image = cv2.imread(original_image_path)
     else:
-        image = cv2.imread(edited_image_path)
+        image = cv2.imread(overlay_image_path)
 
     # Apply brightness and contrast
     brightness_value = int(brightness)

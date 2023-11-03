@@ -7,7 +7,7 @@ server_socket.bind(("0.0.0.0", 12345))  # bind to the port you're listening on
 buffer = b"" # stores the data received
 
 complete_marker_original_image = b"transferred_original"
-complete_marker_edited_image = b"transferred_edited"
+complete_marker_overlay_image = b"transferred_overlay"
 marker_overlay_on_and_off = b"overlay"
 overlay = 0
 print("Listening for message...")
@@ -28,11 +28,11 @@ while True:
         buffer = b""
         print("Image received")
 
-    if complete_marker_edited_image in data:
-        print("edited image data received! reconstructing image...")
-        image_data = buffer[:-len(complete_marker_edited_image)]
+    if complete_marker_overlay_image in data:
+        print("overlay image data received! reconstructing image...")
+        image_data = buffer[:-len(complete_marker_overlay_image)]
 
-        with open("edited_image.jpg", "wb") as f:
+        with open("overlay_image.jpg", "wb") as f:
              f.write(image_data)
         buffer = b""
         print("Image received")

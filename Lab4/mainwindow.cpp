@@ -19,9 +19,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightness(int)));
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveImage);
     connect(ui->transferImageButton, &QPushButton::clicked, this, &MainWindow::transferOriginialImage);
-    connect(ui->transferImageButton2, &QPushButton::clicked, this, &MainWindow::transferEditedImage);
+    connect(ui->transferImageButton2, &QPushButton::clicked, this, &MainWindow::transferOverlayImage);
     connect(ui->toggleOverlayButton, &QPushButton::clicked, this, &MainWindow::OverlayToggle);
-
+    connect(ui->pushButton_open_overlay, &QPushButton::clicked, this, &MainWindow::OpenOverlay);
 
 }
 
@@ -195,14 +195,14 @@ void MainWindow::transferOriginialImage()
     udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
 }
 
-void MainWindow::transferEditedImage()
+void MainWindow::transferOverlayImage()
 {
     // set up UDP socket
     QUdpSocket udpSocket;
     udpSocket.bind(QHostAddress(ipaddress), port);
 
     // convert the image
-    QImage image = modifiedImage.toImage();
+    QImage image = overlayImage.toImage();
 
     // convert the image
     QByteArray imageData;
@@ -212,7 +212,7 @@ void MainWindow::transferEditedImage()
 
     int totalSize = imageData.size();
     int bytesSent = 0;
-    QByteArray done = "transferred_edited"; // set end transferred message so program knows when transfer is done
+    QByteArray done = "transferred_overlay"; // set end transferred message so program knows when transfer is done
 
     qDebug() << "totalSize: " << totalSize;
 
@@ -235,4 +235,14 @@ void MainWindow::OverlayToggle() {
     QByteArray overlay = "overlay"; // set end transferred message so program knows when transfer is done
 
     udpSocket.writeDatagram(overlay, QHostAddress(ipaddress), port);
+}
+
+void MainWindow::OpenOverlay() {
+    QString file = QFileDialog::getOpenFileName(this,
+                                                tr("Open File"),
+                                                "C://",
+                                                "Bitmap File (*.bmp);;All files (*.*)");
+    QPixmap picture(file);
+    ui->label_overlay->setPixmap(picture);
+    overlayImage = picture;
 }

@@ -32,6 +32,7 @@ private slots:
     void transferOriginialImage();
     void transferEditedImage();
     void OverlayToggle();
+    void OpenOverlay();
 
 private:
     Ui::MainWindow *ui;
@@ -39,6 +40,7 @@ private:
     int currentContrast = 0;
     QPixmap modifiedImage;
     QPixmap originalImage;
+    QPixmap overlayImage;
     int port = 12345;
     QString ipaddress = "192.168.1.229";
 };

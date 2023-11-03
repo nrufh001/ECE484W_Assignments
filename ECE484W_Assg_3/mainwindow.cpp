@@ -165,9 +165,21 @@ void MainWindow::transferOriginialImage()
     QByteArray imageData;
     QBuffer buffer(&imageData);
     buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "JPEG"); // Use appropriate format
+    image.save(&buffer, "JPG"); // Use appropriate format
 
-    // Send the image data over UDP
+    int chunkSize = 1024;
+    int totalSize = imageData.size();
+    int bytesSent = 0;
+    QByteArray done = "image transferred";
+
+//    while (bytesSent < totalSize) {
+//        QByteArray chunk = imageData.mid(bytesSent, chunkSize);
+//        udpSocket.writeDatagram(chunk, QHostAddress(ipaddress), port);
+//        bytesSent += chunk.size();
+//    }
+
+//    udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
+
     udpSocket.writeDatagram(imageData, QHostAddress(ipaddress), port);
 }
 

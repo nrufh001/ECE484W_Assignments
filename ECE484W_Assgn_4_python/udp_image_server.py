@@ -1,18 +1,25 @@
 import socket
 
-# Create a UDP socket
+# UDP socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(("0.0.0.0", 12345))  # Bind to the port you're listening on
+server_socket.bind(("0.0.0.0", 12345))  # bind to the port you're listening on
+
+buffer = b"" # stores the data received
+
+complete_marker = b"image transferred"
 
 while True:
-    # Receive data from Qt C++ application
-    data, addr = server_socket.recvfrom(1024)  # Adjust buffer size as needed
+    # receive data from Qt
+    data, addr = server_socket.recvfrom(1024)  # buffer size instructions say to set it to this
 
-    # Process the received image data
-    # You may need to deserialize and display/save the image
-    # Depending on the format, you may use OpenCV or PIL
+    buffer += data
+    
+    if complete_marker in data:
+        image_data = buffer[:-len(complete_marker)]
 
-    # Example: Saving the received image as a file
-    with open("received_image.jpg", "wb") as f:
-        f.write(data)
+        with open("received_image.jpg", "wb") as f:
+             f.write(data)
+
+        buffer = b""
+        print("Image received")
 

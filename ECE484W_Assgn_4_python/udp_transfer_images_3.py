@@ -22,7 +22,7 @@ while True:
         print("original image data received! reconstructing image...")
         image_data = buffer[:-len(complete_marker_original_image)]
 
-        with open("original_image.jpg", "wb") as f:
+        with open("images/original_image.jpg", "wb") as f:
              f.write(image_data)
 
         buffer = b""
@@ -32,7 +32,7 @@ while True:
         print("overlay image data received! reconstructing image...")
         image_data = buffer[:-len(complete_marker_overlay_image)]
 
-        with open("overlay_image.jpg", "wb") as f:
+        with open("images/overlay_image.jpg", "wb") as f:
              f.write(image_data)
         buffer = b""
         print("Image received")

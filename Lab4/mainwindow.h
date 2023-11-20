@@ -31,7 +31,6 @@ private slots:
     void saveImage();
     void transferOriginialImage();
     void transferOverlayImage();
-    void OverlayToggle();
     void OpenOverlay();
 
 private:
@@ -41,8 +40,7 @@ private:
     QPixmap modifiedImage;
     QPixmap originalImage;
     QPixmap overlayImage;
-    QByteArray overlayState = "1"; // 0 is off and 1 is on
     int port = 12345;
-    QString ipaddress = "192.168.1.213";
+    QString ipaddress = "192.168.215.68";
 };
 #endif // MAINWINDOW_H

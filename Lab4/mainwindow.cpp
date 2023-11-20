@@ -18,9 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightnessValue(int)));
     connect(ui->BrightnessSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBrightness(int)));
     connect(ui->saveButton, &QPushButton::clicked, this, &MainWindow::saveImage);
-    connect(ui->transferImageButton, &QPushButton::clicked, this, &MainWindow::transferOriginialImage);
     connect(ui->transferImageButton2, &QPushButton::clicked, this, &MainWindow::transferOverlayImage);
-    connect(ui->toggleOverlayButton, &QPushButton::clicked, this, &MainWindow::OverlayToggle);
     connect(ui->pushButton_open_overlay, &QPushButton::clicked, this, &MainWindow::OpenOverlay);
 
 }
@@ -72,13 +70,9 @@ void MainWindow::updateBrightness(int value)
 
     modifiedImage = QPixmap::fromImage(image);
 
-    // Send the updated value to the FPGA board
-    //    QByteArray brightnessData = "B" + QString::number(value).toUtf8();
-    //    udpSocket.writeDatagram(brightnessData, QHostAddress("192.168.1.72"), 80);
-
-    // Alternative Design (much simpler) - just throw all values together
+    // just throw all values together
     QString brightnessAndContrast = QString("%1").arg(value, 2, 10, QChar('0')) + // just makes sure that whenever < 10 we add a 0
-                                    QString("%1").arg(currentContrast, 2, 10, QChar('0')) + overlayState; // ensures that we send 4 bits at all time
+                                    QString("%1").arg(currentContrast, 2, 10, QChar('0')); // ensures that we send 4 bits at all time
     QByteArray data = brightnessAndContrast.toUtf8();
     udpSocket.writeDatagram(data, QHostAddress(ipaddress), 80); // send data
     qDebug() << data;
@@ -92,8 +86,7 @@ void MainWindow::updateContrast(int value)
     double factor = static_cast<double>(value); // this is from the slider
     double newFactor;
 
-    int remappedValue = 0; // for remapping the -127-128 contrast values to a better 0-99
-    currentContrast = remappedValue;
+    //int remappedValue = 0; // for remapping the -127-128 contrast values to a better 0-99
 
     int red;
     int green;
@@ -126,16 +119,13 @@ void MainWindow::updateContrast(int value)
     modifiedImage = QPixmap::fromImage(image);
 
     // Convert values from -127-128 to 0-99 bc that's the range we need for the LED's
-    remappedValue = ((value + 127) * (99 - 0)) / (128 + 127) + 0;
+    //remappedValue = ((value + 127) * (99 - 0)) / (128 + 127) + 0;
+    // currentContrast = remappedValue
+    currentContrast = value;
 
-    // Send the updated value to the FPGA board
-    //    QByteArray contrastData = "C" + QString::number(remappedValue).toUtf8();
-    //    udpSocket.writeDatagram(contrastData, QHostAddress("192.168.1.72"), 80);
-    //    qDebug() << remappedValue;
-
-    // Alternative Design (much simpler) - just throw all values together
+    // just throw all values together
     QString brightnessAndContrast = QString("%1").arg(currentBrightness, 2, 10, QChar('0')) +
-                                    QString("%1").arg(remappedValue, 2, 10, QChar('0')) + overlayState;
+                                    QString("%1").arg(value, 2, 10, QChar('0'));
     QByteArray data = brightnessAndContrast.toUtf8();
     udpSocket.writeDatagram(data, QHostAddress(ipaddress), 80);
     qDebug() << data;
@@ -165,41 +155,10 @@ void MainWindow::on_pushButton_clicked()
 
     // gonna send an initial data packet to get everything going
     QString data = QString("%1").arg(currentBrightness, 2, 10, QChar('0')) +
-                                    QString("%1").arg(currentContrast, 2, 10, QChar('0')) + overlayState;
+                                    QString("%1").arg(currentContrast, 2, 10, QChar('0'));
     QByteArray packet = data.toUtf8();
     udpSocket.writeDatagram(packet, QHostAddress(ipaddress), 80);
     qDebug() << packet;
-}
-
-void MainWindow::transferOriginialImage()
-{
-    // set up UDP socket
-    QUdpSocket udpSocket;
-    udpSocket.bind(QHostAddress(ipaddress), port);
-
-    // convert the image
-    QImage image = originalImage.toImage();
-
-    // convert the image
-    QByteArray imageData;
-    QBuffer buffer(&imageData);
-    buffer.open(QIODevice::WriteOnly);
-    image.save(&buffer, "JPG");
-
-    int totalSize = imageData.size();
-    int bytesSent = 0;
-    QByteArray done = "transferred_original"; // set end transferred message so program knows when transfer is done
-
-    qDebug() << "totalSize: " << totalSize;
-
-    while (bytesSent < totalSize) {
-        QByteArray chunk = imageData.mid(bytesSent, 1024);
-        udpSocket.writeDatagram(chunk, QHostAddress(ipaddress), port);
-        bytesSent += chunk.size();
-        qDebug() << "chunk: " << chunk.size() << " --> " << "bytesSent: " << bytesSent;
-    }
-
-    udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
 }
 
 void MainWindow::transferOverlayImage()
@@ -231,24 +190,6 @@ void MainWindow::transferOverlayImage()
     }
 
     udpSocket.writeDatagram(done, QHostAddress(ipaddress), port);
-}
-
-void MainWindow::OverlayToggle() {
-    if(overlayState == "0") { // switches the state when button is pressed
-        overlayState = "1";
-        qDebug() << "Overlay: ON";
-        ui->label_overlay->setPixmap(overlayImage);
-    } else {
-        overlayState = "0";
-        qDebug() << "Overlay: OFF";
-        ui->label_overlay->clear();
-    }
-
-    QString data = QString("%1").arg(currentBrightness, 2, 10, QChar('0')) +
-                   QString("%1").arg(currentContrast, 2, 10, QChar('0')) + overlayState;
-    QByteArray packet = data.toUtf8();
-    udpSocket.writeDatagram(packet, QHostAddress(ipaddress), 80);
-    qDebug() << packet;
 }
 
 void MainWindow::OpenOverlay() {

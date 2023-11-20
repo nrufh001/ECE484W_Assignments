@@ -29,7 +29,6 @@ private slots:
     void updateBrightness(int value);
     void updateContrast(int value);
     void saveImage();
-    void transferOriginialImage();
     void transferOverlayImage();
     void OpenOverlay();
 

@@ -3,17 +3,36 @@
 #include <cstdlib>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <opencv2/opencv.hpp>
+
+using namespace cv;
+using namespace std;
 
 // Flag to control the threads
 bool exitFlag = false;
 
-// Function to process received data (you can replace this with your actual processing logic)
+// Processes received data
+// https://www.opencv-srf.com/2018/02/change-brightness-of-images-and-videos.html#:~:text=If%20you%20want%20to%20increase,every%20pixel%20in%20the%20image.&text=If%20you%20want%20to%20decrease,every%20pixel%20in%20the%20image
+// https://www.opencv-srf.com/2018/02/change-contrast-of-images-and-videos.html#:~:text=In%20order%20to%20increase%20the,positive%20constant%20larger%20that%20one.&text=In%20order%20to%20decrease%20the,positive%20constant%20smaller%20that%20one.
 void editImage(int brightness, int contrast) {
     std::cout << "Editing image with brightness: " << brightness << ", contrast: " << contrast << std::endl;
-    // Add your image processing logic here
+    
+    // Image processing
+    Mat image = imread("/images/overlay_image.jpg");
+
+        // Check for failure
+    if (image.empty())
+    {
+        cout << "Could not open or find the image" << endl;
+    }
+
+    // might need to adjust the 0 - 100 range for contrast so that it's more like 0.0 - 10.0 idk yet tho
+    // Mat alteredImage;
+    // image.convertTo(alteredImage, -1, contrast, brightness);
+
 }
 
-int main() {
+int main(int argc, char** argv) {
     const char* LOCAL_UDP_IP = "0.0.0.0";
     const int LOCAL_UDP_PORT = 80;
 

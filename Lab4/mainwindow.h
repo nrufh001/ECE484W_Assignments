@@ -40,6 +40,6 @@ private:
     QPixmap originalImage;
     QPixmap overlayImage;
     int port = 12345;
-    QString ipaddress = "192.168.215.68";
+    QString ipaddress = "192.168.0.151";
 };
 #endif // MAINWINDOW_H
